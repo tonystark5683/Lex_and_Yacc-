@@ -1,0 +1,1706 @@
+
+
+
+
+
+
+1.To count and print words that start with ‘k’ or ‘k’. 
+Code - 
+%{
+# include<stdio.h>
+int count=0;
+%}
+%%
+[a-jl-z]+k+[a-z]* ;
+[kK][a-zA-Z]* {count++; printf("%d:%s\n",count,yytext);}
+[\n] { printf("The count is %d\n",count);}
+. ;
+%%
+int yywrap(){}
+int main(){
+printf("Enter the input:");
+yylex();
+return 0;
+}
+OUTPUT - 
+2
+2. To count and print words that has at least two vowels 
+Code – 
+%{
+# include<stdio.h>
+int count=0;
+%}
+vowel [aeiouAEIOU]
+cons [^aeiouAEIOU]
+text [a-zA-Z]
+%%
+{cons}*{vowel}{cons}*{vowel}{text}* {count ++; printf("%s\n",yytext);}
+[\n] {printf("Count is %d", count);}
+. ;
+%%
+int yywrap(){}
+int main(){
+printf("Enter the input:");
+yylex();
+return 0;
+} 
+OUTPUT - 
+3
+3. To count and print words that are in mixed case. 
+Code – 
+%{
+# include<stdio.h>
+int count=0;
+%}
+upper [A-Z]
+lower [a-z]
+text [a-zA-Z]
+%%
+{upper}+{lower}+{text}* {count++; printf("%s\n",yytext); }
+{lower}+{upper}+{text}* {count++; printf("%s\n",yytext); }
+[\n] {printf("Count Is:%d",count);}
+. ;
+%%
+int yywrap(){}
+int main(){
+printf("Enter the input:");
+yylex();
+return 0;
+} 
+OUTPUT – 
+ 
+4
+ 
+4. To convert the words in lower case to uppercase 
+Code - 
+%{
+# include<stdio.h>
+int count=0;
+%}
+%%
+[a-z] {printf("%c", yytext[0]-32);}
+[\n] {printf("\n");}
+. ECHO;
+%%
+int yywrap(){}
+int main(){
+printf("Enter the input:");
+yylex();
+return 0;
+}
+
+
+
+
+
+
+
+
+1. To check whether the input contains a verb 
+Code - 
+%{
+# include <stdio.h>
+%}
+%%
+[\t ]+;
+is |
+am |
+are |
+were |
+was |
+be |
+being |
+been |
+do |
+does |
+did |
+will |
+would |
+should |
+can |
+could |
+has |
+have |
+had |
+go { printf("%s: is a verb\n", yytext); }
+[a-zA-Z]+ { printf("%s: is not a verb\n", yytext); }
+.|\n { ECHO;}
+%%
+int yywrap(){}
+int main()
+{
+
+yylex();
+return 0;
+}
+OUTPUT - 
+2. To print the types of numbers such as decimal number, whole 
+number… 
+ 
+Code – 
+%{
+# include <stdio.h>
+%}
+%%
+[0-9]+"."[0-9]+ { printf("%s decimal number",yytext);}
+[0-9]+ { printf("%s whole number",yytext);}
+"-"[0-9]* {printf("%s negative number",yytext);}
+"-"[0-9]+"."[0-9]+ {printf("%s negative decimal number",yytext);}
+. {ECHO;}
+%%
+int yywrap(){}
+int main()
+{
+3
+printf("Enter The Input: ");
+yylex();
+return 0;
+} 
+ 
+OUTPUT - 
+3. To count and print all characters other than letters…. 
+Code – 
+%{
+#include <stdio.h>
+int n=0;
+%}
+%%
+[a-zA-Z]+ {}
+. {n++;printf("%s\n",yytext);}
+%%
+int yywrap(){}
+int main(){
+yylex();
+printf("%d",n);
+return 0;
+4
+} 
+ 
+OUTPUT – 
+ 
+ 
+4. To count and print the number of whitespaces 
+Code - 
+%{
+#include <stdio.h>
+int count=0;
+%}
+%%
+" " {count++;}
+%%
+int yywrap(){}
+int main(){
+printf("Enter the input:");
+yylex();
+printf("The Count is:%d",count);
+return 0;
+} 
+OUTPUT – 
+5
+ 
+5. To count the number of words, lines and characters in the input 
+file. 
+Code - 
+%{
+#include <stdio.h>
+int lines=0,spaces=0,word=0,chracter=0,Sletter=0,Cletter=0,digit=0;
+%}
+%%
+[/n] {lines++; chracter++;}
+[ \t] {spaces++; chracter++;}
+[^\t\n ]+ {word++; chracter++;}
+[0-9] {digit++; chracter++;}
+[a-z] {Sletter++; chracter++;}
+[A-Z] {Cletter++; chracter++;}
+%%
+int yywrap(){}
+int main(){
+yyin = fopen("sourav1.txt", "r"); yylex();
+yylex();.l
+printf("%d Lines\n",lines);
+printf("%d spaces\n",spaces);
+printf("%d word\n",word);
+printf("%d chracter\n",chracter);
+printf("%d digit\n",digit);
+return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. Validation of an Expression using Yacc program. 
+Lex Code - 
+%{
+#include "y.tab.h"
+%}
+%%
+[a-zA-Z]+ {return ID;}
+[ \t]+ ;
+\n {return 0;}
+. {return yytext[0];}
+%%
+int yywrap(){}
+yacc Code - 
+%{
+#include <stdio.h>
+int yylex(void);
+int yyerror(char* s);
+%}
+%token ID
+%left '+' '-'
+%left '*' '/'
+%%
+E:T {printf("Valid Expression\n"); return 0;}
+T: T'+'T |
+T'-'T |
+T'*'T |
+T'/'T |
+2
+'('T')'|
+ID
+%%
+int main(){
+printf("Enter Expression: \n");
+yyparse();
+}
+int yyerror(char* s){
+printf("Invalid Expression\n");
+}
+OUTPUT – 
+ 
+2. Evaluating the Expression using Yacc program. 
+Lex Code – 
+%{
+#include "y.tab.h"
+extern int yylval;
+%}
+3
+%%
+[0-9]+ {yylval = atoi(yytext); return NUMBER;}
+[ \t]+ ;
+\n {return 0;}
+. {return yytext[0];}
+%%
+int yywrap(){}
+yacc Code – 
+ 
+%{
+#include <stdio.h>
+int yylex(void);
+int yyerror(char* s);
+%}
+%token NUMBER
+%left '+' '-'
+%left '*' '/'
+%%
+E:T {printf("Result = %d\n", $$); return 0;}
+T: T'+'T {$$ = $1 + $3;}|
+T'-'T {$$ = $1 - $3;}|
+T'*'T {$$ = $1 * $3;}|
+T'/'T {$$ = $1 / $3;}|
+'('T')' {$$ = $2;}|
+NUMBER {$$ = $1;}
+%%
+int main(){
+4
+printf("Enter Expression: \n");
+yyparse();
+}
+int yyerror(char* s){
+printf("Invalid\n");
+}
+OUTPUT – 
+ 
+3. Lex program for dfa for the language even number of a s and 
+even number of b s 
+Lex Code – 
+%{
+%}
+%s A DEAD
+%%
+<INITIAL>a BEGIN A;
+<INITIAL>b BEGIN INITIAL;
+<INITIAL>[^ab\n] BEGIN DEAD;
+<INITIAL>\n BEGIN INITIAL; {printf("Accepted\n");}
+<A>a BEGIN INITIAL;
+<A>b BEGIN A;
+<A>[^ab\n] BEGIN DEAD;
+5
+<A>\n BEGIN INITIAL; {printf("Not Accepted\n");}
+<DEAD>[^\n] BEGIN DEAD;
+<DEAD>\n BEGIN INITIAL; {printf("Invalid\n");}
+%%
+int yywrap()
+{
+return 1;
+} 
+int main()
+{
+ printf("Enter String\n");
+ yylex();
+return 0;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. Validation of a Grammar using Yacc program. 
+E-> e * e | e + e |T 
+t->T – t| f 
+f-> num 
+Lex Code - 
+%{
+#include "ex4.tab.h"
+%}
+%%
+[0-9]+ {return num;}
+[\t]+ ;
+\n {return 0;}
+. {return yytext[0];}
+%%
+int yywrap(){}
+int yywrap(){}
+yacc Code - 
+%{
+int yylex(void);
+#include<stdio.h>
+#include <stdlib.h>
+int yyerror(char* s);
+%}
+%token num
+%left '*''+'
+%left '-'
+2
+%%
+st: E {printf("String Accepted\n");return 0;}
+;
+E: E '*' T
+|E '+' T
+|T
+;
+T: T '-' T
+|F
+;
+F: num
+|
+;
+%%
+int main(){
+printf("Enter The String:\n");
+yyparse();
+return 0;
+}
+int yyerror(char *s)
+{
+printf("String Rejected\n");
+}
+OUTPUT – 
+ 
+3
+2. YACC progrAm to reCognize string with grAmmAr { Anbn | n≥0 } 
+Lex Code – 
+%{
+#include "ex4q1.tab.h"
+%}
+%%
+[aA] {return A;}
+[bB] {return B;}
+\n {return NL;}
+. {return yytext[0];}
+%%
+int yywrap(){}
+yacc Code – 
+%{
+#include<stdio.h>
+#include<stdlib.h>
+int yylex(void);
+int yyerror(char* s);
+%}
+4
+%token A B NL
+%%
+stmt: S NL { printf("valid string
+\n");
+exit(0); }
+;
+S: A S B | ;
+%%
+int main() {
+printf("enter the string
+\n");
+yyparse(); }
+int yyerror(char *msg) {
+printf("invalid string
+\n");
+}
+OUTPUT 
+– 
+5
+3. YACC progrAm to reCognize string with grAmmAr { Anbn | n≥3 } 
+Lex Code – 
+%{
+#include "ex4q1.tab.h"
+%}
+%%
+[aA] {return A;}
+[bB] {return B;}
+\n {return NL;}
+. {return yytext[0];}
+%%
+int yywrap(){}
+yacc Code – 
+%{
+#include<stdio.h>
+#include<stdlib.h>
+int yylex(void);
+int yyerror(char* s);
+%}
+%token A B NL
+%%
+stmt: A A A S B B B NL { printf("valid string\n");
+exit(0); }
+;
+S: A S B |
+;
+%%
+6
+int main()
+{
+printf("enter the string\n");
+yyparse();
+}
+int yyerror(char *msg)
+{
+printf("invalid string\n");
+}
+OUTPUT – 
+4. Evaluating palindrome Strings using Yacc program. 
+Lex Code – 
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include "ggg.tab.h"
+%}
+7
+%%
+[a-zA-Z]+ {yylval.f = yytext; return STR;}
+[-+()*/] {return yytext[0];}
+[ \t\n] {;}
+%%
+int yywrap()
+{
+return -1;
+}
+yacc Code – 
+%{
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+extern int yylex();
+void yyerror(char *msg);
+int flag;
+int i;
+int k =0;
+%}
+%union {
+char* f;
+}
+%token <f> STR
+%type <f> E
+%%
+S : E {
+flag = 0;
+8
+k = strlen($1) - 1;
+if(k%2==0){
+for (i = 0; i <= k/2; i++) {
+if ($1[i] == $1[k-i]) {
+} else {
+flag = 1;
+}
+}
+if (flag == 1) printf("Not palindrome\n");
+else printf("%s is a palindrome\n", $1);
+}else{
+for (i = 0; i < k/2; i++) {
+if ($1[i] == $1[k-i]) {
+} else {
+flag = 1;
+}
+}
+if (flag == 1) printf("Not palindrome\n");
+else printf("%s is a palindrome\n", $1);
+}
+}
+;
+E : STR {$$ = $1;}
+;
+%%
+void yyerror(char *msg)
+{
+fprintf(stderr, "%s\n", msg);
+exit(1);
+9
+}
+int main()
+{
+yyparse();
+return 0;
+}
+OUTPUT – 
+5. All possible Strings starting with 0 And ending with 1, using Yacc 
+program. 
+Lex Code – 
+%{
+#include "ggg.tab.h"
+extern int yylval;
+%}
+%%
+0 {yylval = 0; return ZERO;}
+1 {yylval = 1; return ONE;}
+\n {return NL;}
+10
+. {return yytext[0];}
+%%
+int yywrap(){}
+yacc Code – 
+%{
+int yylex(void);
+#include<stdio.h>
+#include <stdlib.h>
+int yyerror(char* s);
+%}
+%token ZERO ONE NL
+%%
+st : ZERO s ONE NL{printf("Sequence Accepted\n");}
+;
+s : ZERO s
+| ONE s
+| ZERO
+| ONE
+;
+%%
+int main()
+{
+printf("Enter Sequence of Zeros and Ones : \n");
+yyparse();
+return 0;
+}
+11
+int yyerror(char *s)
+{
+printf("Sequence Rejected\n");
+}
+OUTPUT – 
+6. All possible Strings starting with 01 And ending with 10, using Yacc 
+program. 
+Lex Code – 
+%{
+#include "ggg.tab.h"
+extern int yylval;
+%}
+%%
+0 {yylval = 0; return ZERO;}
+1 {yylval = 1; return ONE;}
+\n {return NL;}
+. {return yytext[0];}
+%%
+int yywrap(){
+}
+12
+yacc Code – 
+%{
+int yylex(void);
+#include<stdio.h>
+#include <stdlib.h>
+int yyerror(char* s);
+%}
+%token ZERO ONE NL
+%%
+stmt: S {printf("Input Accepted\n");exit(0);}
+;
+S: ZERO ONE A ONE ZERO 
+| ZERO ONE ONE ZERO 
+|ZERO ONE ZERO 
+;
+A: A ONE 
+|A ZERO 
+|ZERO 
+|ONE 
+;
+%%
+int main()
+{
+printf("Enter Sequence of Zeros and Ones : \n");
+yyparse();
+return 0;
+}
+13
+int yyerror(char *s)
+{
+printf("Sequence Rejected\n");
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. Relational grammar validation. 
+Lex Code - 
+%{
+#include "ex5q1.tab.h" 
+extern int yylval;
+%}
+%% 
+[0-9]+ {
+yylval = atoi(yytext);
+return NUMBER;
+}
+[ \t]+ ;
+\n {return 0; }
+. {return yytext[0]; }
+%% 
+int yywrap(){}
+yacc Code - 
+%{
+#include <stdio.h> 
+int yylex(void); 
+int yyerror(char* s);
+%}
+%token NUMBER
+%left'>''<'
+2
+%left'=''!'
+%%
+E:T{ return 0;}
+T:T'>'T {($1>$3)?printf("true\n"):printf("false\n");}
+|T'<'T {($1<$3)?printf("true\n"):printf("false\n");}
+|T'>''='T {($1>=$4)?printf("true\n"):printf("false\n");}
+|T'<''='T {($1<=$4)?printf("true\n"):printf("false\n");}
+|T'!''='T {($1!=$4)?printf("true\n"):printf("false\n");}
+|T'='T{($1=$2)?printf("true\n"):printf("false\n");}
+|NUMBER;
+%%
+int main() {
+printf("Enter the expression\n");
+yyparse();
+}
+int yyerror(char* s) {
+printf("\nExpression is invalid\n");
+}
+3
+OUTPUT – 
+ 
+2. YACC program to recognize string of ‘for’ Loop 
+Lex Code – 
+%{
+#include "ex5q1.tab.h" 
+extern int yylval;
+%}
+aplha[a-zA-Z]
+digit[0-9]
+%% 
+[\t\n]{}
+'for' return FOR;
+{digit}+ return NUM;
+4
+{alpha}({alpha}|{digit})* return id;
+"<=" return le;
+">=" return ge;
+"==" return eq;
+"!=" return ne;
+"&&" return and;
+"||" return or;
+. return yytext[0];
+%%
+int yywrap(){}
+yacc Code – 
+%{
+#include <stdio.h> 
+#include <stdlib.h> 
+int yylex(void); 
+int yyerror(char* s);
+%}
+%token NUM id FOR le ge eq ne or and
+%right '='
+%left or and
+%left '>' '<' le ge eq ne
+%left '+' '-'
+%left '*' '/'
+%left '!'
+%%
+s: st {printf("valid Input");return 0;}
+st: FOR '(' E ';' E2 ';' E ')' DEF
+;
+5
+DEF: '{' BODY '}'
+|E ';'
+|st |;
+BODY: BODY BODY
+|E ';'
+|st |;
+E: id '=' E
+|E '+' E
+|E '
+-' E
+|E '*' E
+|E '/' E
+|E '<' E
+|E '>' E
+|E le E
+|E ge E
+|E eq E
+|E ne E
+|E or E
+|E and E
+|E '+' '+'
+|E '
+-' '
+-'
+|id
+|NUM ;
+E2: E '<' E
+|E '>' E
+|E le E
+|E ge E
+|E eq E
+6
+|E ne E
+|E or E
+|E and E ;
+%%
+int main() {
+printf("Enter the expression
+\n");
+yyparse();
+return 0; }
+int yyerror(char* s) {
+printf("Expression is invalid
+\n");
+} 
+
+
+
+
+1. Reverse the given word 
+Code - 
+%{
+#include <stdio.h>
+#include <string.h> 
+%}
+ 
+%%
+[a-zA-Z0-9]+ {
+ for(int i = yyleng - 1; i >= 0; i--) {
+ printf("%c", yytext[i]);
+ }
+}
+.|\n ECHO;
+%%
+int main()
+{
+printf("Enter Input\n");
+yylex();
+return 0;
+}
+int yywrap()
+{
+return 1;
+}
+OUTPUT – 
+ 
+2
+2. Reverse all the words 
+Code – 
+%{
+#include <stdio.h>
+#include <string.h> 
+%}
+ 
+%%
+[a-zA-Z0-9]+ {
+ for(int i = yyleng - 1; i >= 0; i--) {
+ printf("%c", yytext[i]);
+ }
+}
+.|\n ECHO;
+%%
+int main()
+{
+yyin =fopen("sourav.txt","r");
+yylex();
+return 0;
+}
+3
+int yywrap()
+{
+return 1;
+}
+ 
+OUTPUT - 
+3. Replace the matching word 
+Code – 
+%{
+#include<stdio.h>
+#include<string.h>
+char replace_with [] = "kurmi";
+char replace [] ="ui";
+%}
+4
+%%
+[a-zA-Z]+ { if(strcmp(yytext, replace)==0)
+fprintf(yyout, "%s", replace_with);
+else
+fprintf(yyout, "%s", yytext);}
+. fprintf(yyout, "%s", yytext);
+%%
+int yywrap()
+{
+return 1;
+}
+int main()
+{
+extern FILE *yyin, *yyout;
+yyin=fopen("sourav.txt", "r");
+yyout=fopen("sourav1.txt", "w");
+yylex();
+} 
+OUTPUT – 
+ 
+ 
+ 
+ 
+ 
+5
+4. Lower case into upper case 
+Code - 
+%{
+#include <stdio.h>
+#include <string.h> 
+%}
+ 
+%%
+[a-z] {printf("%c", yytext[0]-32);}
+[\n] {printf("\n");}
+. ECHO;
+%%
+int main()
+{
+yyin =fopen("sourav.txt","r");
+yylex();
+return 0;
+}
+int yywrap()
+{
+return 1;
+}
+OUTPUT – 
+ 
+6
+ 
+ 
+5. To Count the total number of words, lines, characters without 
+including whitespaces. 
+Code - 
+%{
+#include <stdio.h>
+#include <string.h> 
+int nlines,nwords,nchars;
+%}
+%%
+\n {
+nchars++;nlines++; 
+}
+[^ \n\t]+ {nwords++, nchars=nchars+yyleng;}
+. {nchars++;}
+%%
+int yywrap() 
+{
+return 1;
+}
+7
+int main() 
+{
+yyin =fopen("sourav.txt","r");
+yylex();
+printf("Lines = %d\nChars=%d\nWords=%d",nlines,nchars,nwords);
+return 0;
+}
+OUTPUT – 
+ 
+6. Read the file contents and display it in terminal 
+%{
+#include <stdio.h>
+#include <string.h> 
+%}
+%%
+. {printf(yytext);}
+%%
+int yywrap() 
+{
+return 1;
+}
+int main() 
+{
+yyin =fopen("sourav.txt","r");
+8
+yylex();
+return 0;
+} 
+ 
+ 
+OUTPUT – 
+ 
+ 
+7. Yacc program for while loop 
+Lex code 
+%{
+ #include "ex6q6.tab.h"
+%}
+%%
+"while" {return key;}
+"(" {return ob;}
+")" {return cb;}
+" " {return sp;}
+";" {return sc;}
+"int"|"char"|"float" {return dec;}
+"&&"|"||" {return tt;}
+[a-z]+ {return vb;}
+[0-9]+ {return nu;}
+9
+">"|"<"|">="|"<="|"="|"!=" {return op;}
+"{" {return co;}
+"}" {return cc;}
+%%
+int yywrap(){}
+Yacc code 
+%{
+#include<stdio.h>
+%}
+%token key
+%token ob
+%token op
+%token vb
+%token cb
+%token nu
+%token co
+%token cc
+%token cn
+%token tt
+%token sp
+%token sc
+%token dec
+%%
+line:key ob rp cb co a cc {printf("\n correct");}
+ ;
+a:vb
+ |nu
+ |vb nu
+ |a a
+ |dec sp vrb sc
+ ;
+vrb:vb nu
+ |vb
+10
+ 
+;
+rp:ob vrb op a cb
+ |rp tt rp
+ |vb op nu
+ |vrb op vrb
+ |vrb op nu
+ 
+;
+%%
+#include"lex.yy.c"
+int main() {
+yyparse(); }
+int yywrap() {
+return 1; }
+int yyerror() {
+return 1; }
+
+
+1. check the mobile number is vaild or not 
+Code - 
+%{
+int flag=0;
+%}
+%%
+[+][9][1][ ][1-9][0-9]+ {flag=1;}
+. ;
+[\n] {if(flag==1){printf("Valid");} else {printf("Invalid");}}
+%%
+int main()
+{
+yylex();
+return 0;
+}
+int yywrap()
+{}
+OUTPUT – 
+ 
+2. To validate the vit email id 
+Code – 
+%{
+ int flag = 0;
+%}
+2
+%%
+[a-z]+.[a-z]+[0-9]+"@vitstudent.ac.in" {flag = 1;} 
+[\n] {if(flag==1){printf("Valid");} else {printf("Invalid");}}
+%%
+int main() {
+ yylex();
+}
+int yywrap()
+{} 
+OUTPUT - 
+3. to find factorial of a number 
+Code – 
+%{
+#include <stdio.h>
+int factorial(int n);
+%}
+%%
+[0-9]+ { int n = atoi(yytext); printf("Factorial of %d is %d\n", n, factorial(n)); }
+.|\n { }
+%%
+int yywrap(){};
+int main()
+{printf("Enter Input\n");
+3
+ yylex();
+ return 0;
+}
+int factorial(int n)
+{
+ if (n == 0) {
+ return 1;
+ } else {
+ return n * factorial(n-1);
+ }
+} 
+OUTPUT – 
+ 
+4. Yacc program for valid C identifier declaration statement. 
+ For example, 
+ int sum,rate; 
+ int total; 
+ int a=10,b=20; 
+lex Code - 
+%{
+#include"ggg.tab.h"
+%}
+%%
+int { return INT; }
+[a-zA-Z][a-zA-Z0-9]* { return IDENTIFIER; }
+, {return comma; }
+4
+; { return SEMICOLON; }
+. ;
+%%
+int yywrap(void)
+{
+return 1;
+}
+yacc Code - 
+%{
+#include<stdio.h>
+#inciude <stdlib.h>
+%}
+%token INT IDENTIFIER COMMA SEMICOLON
+%%
+program: statement_list
+ ;
+statement_list: statement
+ | statement_list statement
+ ;
+statement: INT identifier_list SEMICOLON {printf("valid\n");}
+ ;
+identtfter_list: IDENTIFIER
+ | identifier_list COMMA IDENTIFIER
+ ;
+expression: IDENTIFIER
+ | expression COMMA IDENTIFIER
+ ;
+%%
+int main()
+{
+ printf("Enter the statement: \n");
+ yyparse( ) ;
+ return 0;
+5
+}
+void yyerror(char *s)
+{
+ printf("Invalid statement\n");
+}
+OUTPUT – 
+ 
+5. Lex program to add Line number to “sampLe.c” program(ignore 
+comment line) 
+Code - 
+%{
+#include <stdio.h>
+int l = 0;
+%}
+%%
+[//][ |\t|a-zA-Z|0-9|.*][\n] {fprintf(yyout," |%s",yytext);}
+[\n] {l++; fprintf(yyout, "%d| %s",l,yytext);}
+. {yymore();}
+%%
+int yywrap(){)
+int main(){
+ yyin = fopen("sample.c","r");
+ yyout = fopen("output.txt","w");
+ yylex();
+ return 0;
+}
+
+
+1. lex program for decimal to binary 
+ 
+Lex Code - 
+%{
+#include <stdio.h>
+int result;
+%}
+%%
+[0-9]+ {int rem, i = 1, n = atoi(yytext);
+ while (n != 0){
+ rem = n % 2;
+ n /= 2;
+ result += rem * i;
+ i *= 10;
+ } 
+}
+\n {printf("Binary Number is: %d\n", result); return 0;}
+. ;
+%%
+int yywrap(){}
+int main(){
+ printf("Enter Decimal Number: ");
+ yylex();
+ return 0;
+}
+OUTPUT – 
+2
+ 
+2. lex program to binary to decimal 
+Lex Code - 
+%{
+#include <stdio.h>
+#include <math.h>
+int result;
+%}
+%%
+[0-1]+ {int n = atoi(yytext), i = 0, x = 0;
+while(n != 0){
+x = n % 10;
+n /= 10;
+if(x == 1){
+result += pow(2, i);
+}
+i++;
+} 
+}
+\n {printf("Decimal Number is: %d\n", result); return 0;}
+. ;
+%%
+int yywrap(){}
+3
+int main(){
+ printf("Enter Binary Number: ");
+ yylex();
+ return 0;
+}
+OUTPUT – 
+3. yacc program for binary to decimal 
+Lex Code - 
+%{
+#include<stdio.h>
+#include<stdlib.h>
+#include"ex8.tab.h"
+extern int yylval;
+%}
+%%
+0 {yylval=0;return ZERO;}
+1 {yylval=1;return ONE;}
+[ \t] {;}
+\n return 0;
+. return yytext[0];
+%%
+4
+int yywrap() {
+return 1; }
+yacc Code 
+- 
+%{
+#include<stdio.h>
+#include<stdlib.h>
+int yylex(void);
+int yyerror(char *s);
+%}
+%token ZERO ONE
+%%
+N: L {printf("%d", $$);}
+L: L B {$$=$1*2+$2;}
+| B {$$=$1;}
+B:ZERO {$$=$1;}
+|ONE {$$=$1;};
+%%
+int main() {
+printf("Enter The Input:
+\n");
+yyparse(); }
+int yyerror(char *s) {
+5
+printf("invalid Input");
+}
+OUTPUT – 
+ 
+4. yacc program for decimal to binary 
+Lex Code – 
+%{
+#include "ex8.tab.h"
+extern int yylval;
+%}
+%%
+[0-9]+ {yylval = atoi(yytext); return NUM;}
+.|\n {return yytext[0];}
+%%
+int yywrap(){}
+yacc Code – 
+6
+%{
+#include <stdio.h>
+int yyerror(char* s);
+int yylex(void);
+int result = 0;
+%}
+%token NUM
+%%
+E: NUM'\n' {int rem, i = 1, n = $$;
+ while (n != 0){
+ rem = n % 2;
+ n /= 2;
+ result += rem * i;
+ i *= 10;
+ }
+ printf("Binary Number is: %d\n", result);
+ return 0; 
+ }
+ ;
+%%
+int main(){
+ printf("Enter Decimal Number: ");
+ yyparse();
+}
+int yyerror(char* s){
+ printf("Invalid\n");
+}
+7
+OUTPUT – 
+ 
+5. yacc program to infix to post fix 
+Lex Code – 
+%{
+#include<stdio.h>
+#include<stdlib.h>
+#include"ex8.tab.h"
+extern int yylval;
+%}
+%%
+[0-9]+ {yylval=atoi(yytext); return NUM;}
+\n return 0;
+. return *yytext;
+%%
+int yywrap()
+{
+return 1;
+}
+8
+yacc Code – 
+%{
+#include<stdio.h>
+#include<stdlib.h>
+int yylex(void);
+int yyerror(char *s);
+%}
+%token NUM
+%left '+' '-'
+%left '*' '/'
+%right NEGATIVE
+%%
+S: E {printf("\n");}
+ ;
+E: E '+' E {printf("+");}
+ | E '*' E {printf("*");}
+ | E '-' E {printf("-");}
+ | E '/' E {printf("/");}
+ | '(' E ')'
+ | '-' E %prec NEGATIVE {printf("-");}
+ | NUM {printf("%d", yylval);}
+ ;
+%%
+int main(){
+printf("Enter Input\n");
+ yyparse();
+}
+int yyerror (char *msg) {
+ return printf ("error YACC: %s\n", msg);
+}
+1. Infix to prefix 
+Lex Code - 
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "y.tab.h"
+%} 
+NUM [0-9]+ 
+CHARACTER [_a-zA-Z][_a-zA-Z0-9]* 
+%%
+ 
+exit.* { return EXIT; } 
+quit.* { return EXIT; } 
+{NUM} {yylval.exp = strdup(yytext); return NUM;} 
+{CHARACTER} { yylval.exp = strdup(yytext); return CHARACTER;} 
+[+-] { yylval.exp = strdup(yytext); return OPR1; } 
+[/*] { yylval.exp = strdup(yytext); return OPR2; } 
+[()] { return yytext[0]; } 
+\n { return NEWLINE; } 
+. ; 
+%% 
+yacc Code - 
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+extern int yylex();
+int yyerror(const char *p);
+2
+char *concat(const char* s1, const char* s2, const char*s3);
+%} 
+%union {
+char *exp;
+int val;
+};
+%token NUM CHARACTER OPR1 OPR2 NEWLINE EXIT 
+%left OPR1 %left OPR2 %start lines
+%% 
+lines: /*empty*/
+|lines exp NEWLINE { printf("%s\n>> ",$<exp>2);}
+;
+exp: exp OPR1 exp {$<exp>$ = concat($<exp>2,$<exp>1,$<exp>3);}
+|exp OPR2 exp {$<exp>$ = concat($<exp>2,$<exp>1,$<exp>3);}
+|'(' exp ')' {$<exp>$ = $<exp>2;}
+|NUM{$<exp>$ = $<exp>1;}
+|CHARACTER {$<exp>$ = $<exp>1;}
+|EXIT {exit(0);}
+;
+%%
+int yywrap(){
+return 1;
+}
+int main(){
+yyparse();
+}
+char *concat(const char* s1, const char* s2, const char*s3){
+int len = strlen(s1) + strlen(s2) + strlen(s3) + 1;
+char *s = malloc(sizeof(char)*len);
+3
+int i=0;
+for(int j=0; s1[j]!='\0'; j++)
+s[i++] = s1[j];
+for(int j=0; s2[j]!='\0'; j++)
+s[i++] = s2[j];
+for(int j=0; s3[j]!='\0'; j++)
+s[i++] = s3[j];
+s[i] = '\0';
+return s;}
+int yyerror(const char *p){
+printf("%s\n",p); return 1;
+}
+OUTPUT – 
+ 
+2. Three address code for a=b+c*d 
+Lex Code – 
+%{
+#include"y.tab.h"
+extern char yyval;
+%}
+%%
+4
+[0-9]+ {yylval.symbol=(char)(yytext[0]);return NUMBER;}
+[a-z] {yylval.symbol= (char)(yytext[0]);return LETTER;}
+. {return yytext[0];}
+\n {return 0;}
+%%
+yacc Code – 
+%{
+#include "y.tab.h"
+#include <stdio.h>
+#include <ctype.h>
+char addtotable(char,char,char);
+int index1 = 0;
+char temp = 'A'-1;
+struct expr{
+char operand1;
+char operand2;
+char operator;
+char result;
+};
+%}
+%union{
+char symbol;
+}
+%left '+' '-'
+%left '/' '*'
+%token <symbol> LETTER NUMBER
+%type <symbol> exp
+%%
+5
+statement: LETTER '=' exp ';' {addtotable((char)$1,(char)$3,'=');};
+exp: exp '+' exp {$$ = addtotable((char)$1,(char)$3,'+');}
+ |exp '-' exp {$$ = addtotable((char)$1,(char)$3,'-');}
+ |exp '/' exp {$$ = addtotable((char)$1,(char)$3,'/');}
+ |exp '*' exp {$$ = addtotable((char)$1,(char)$3,'*');}
+ |'(' exp ')' {$$= (char)$2;}
+ |NUMBER {$$ = (char)$1;}
+ |LETTER {(char)$1;};
+%%
+struct expr arr[20]; 
+void yyerror(char *s){
+ printf("Errror %s",s);
+}
+char addtotable(char a, char b, char o){
+ temp++;
+ arr[index1].operand1 =a;
+ arr[index1].operand2 = b;
+ arr[index1].operator = o;
+ arr[index1].result=temp;
+ index1++;
+ return temp;
+}
+void threeAdd(){
+int i=0;
+ char temp='A';
+ while(i<index1){
+ printf("%c:=\t",arr[i].result);
+ printf("%c\t",arr[i].operand1);
+ printf("%c\t",arr[i].operator);
+ printf("%c\t",arr[i].operand2);
+6
+ i++;
+ temp++;
+ printf("\n");
+ }
+}
+int find(char l){
+ int i;
+ for(i=0;i<index1;i++)
+ if(arr[i].result==l) break;
+ return i;
+}
+int yywrap(){
+ return 1;
+}
+int main(){
+ printf("Enter the expression: ");
+ yyparse();
+ threeAdd();
+ return 0;
+}
+OUTPUT – 
+ 
+ 
+ 
+7
+3. Three address code for while loop 
+Lex Code – 
+%{
+#include "ex8.tab.h"
+extern int yylval;
+%}
+%%
+"while" { return WHILE; }
+"(" { return LPAREN; }
+")" { return RPAREN; }
+"{" { return LBRACE; }
+"}" { return RBRACE; }
+";" { return SEMICOLON; }
+"+" { return PLUS; }
+"-" { return MINUS; }
+"*" { return TIMES; }
+"/" { return DIVIDE; }
+"<" { return LESS_THAN; }
+">" { return GREATER_THAN; }
+"=" { return EQUALS; }
+"!" { return NOT; }
+[0-9]+ { yylval.number = atoi(yytext); return NUMBER; }
+[a-zA-Z]+ { yylval.identifier = strdup(yytext); return IDENTIFIER; }
+[ \t\n]+ { /* ignore whitespace */ }
+. { printf("Unexpected character: %s\n", yytext); }
+%%
+int yywrap(){}
+8
+yacc Code – 
+%{
+#include <stdio.h>
+int yyerror(char* s);
+int yylex(void);
+int result = 0;
+%}
+%token NUMBER
+%token PLUS MINUS TIMES DIVIDE LPAREN RPAREN SEMICOLON
+%token LESS_THAN GREATER_THAN EQUALS NOT
+%token RBRACE LBRACE IDENTIFIER expr WHILE
+%%
+stmt_list: /* empty */
+ | stmt_list stmt SEMICOLON
+stmt: while_stmt
+ | assign_stmt
+while_stmt: WHILE LPAREN expr RPAREN LBRACE stmt_list RBRACE
+ { printf("label%d: ; while loop start\n", label_num);
+ printf("%s\n", $3);
+ printf("ifz t%d goto label%d_end\n", temp_num, label_num);
+ label_stack[label_depth++] = label_num;
+ label_num++;
+ }
+ stmt_list
+ { printf("goto label%d\n", label_stack[--label_depth]);
+ printf("label%d_end: ; while loop end\n", label_stack[label_depth]);
+ }
+9
+assign_stmt: IDENTIFIER EQUALS expr
+ { printf("%s = %s\n", $1, $3); }
+%%
+int main(){
+ printf("Enter Decimal Number: ");
+ yyparse();
+}
+int yyerror(char* s){
+ printf("Invalid\n");
+} 
+
+
+
+
+Exercise-1:
+1. To count and print words that start with ‘k’ or ‘K’.
+2.To count and print words that has at least two vowels.
+3.To count and print words that are in mixed case.
+4. To convert the words in lower case to uppercase
+Exercise2:
+1.To check whether the input contains a verb
+2.To print the types of numbers such as decimal number, whole number
+3.To count and print all characters other than letters
+4.To count and print the number of whitespaces
+5.To count the number of words, lines and characters in the input file.
+Exercise-3:
+yacc programs for validation of expression (9)
+yacc programs for expression and evaluate it....(10)
+Also program for dfa for the language even number of a s and even number of b s
+Exercise-4:
+1.	Validation of a Grammar using Yacc program. (13)
+2.	YACC progrAm to reCognize string with grAmmAr { Anbn | n≥0 } (14)
+3.	. YACC progrAm to reCognize string with grAmmAr { Anbn | n≥3 }
+4.	Evaluating palindrome Strings using Yacc program.(17)
+5.	All possible Strings starting with 0 And ending with 1, using Yacc (19)
+6.	All possible Strings starting with 01 And ending with 10, using Yacc
+
+Exercise-5:
+1.	Relational grammar validation. (23)
+2.	YACC program to recognize string of ‘for’ Loop (24)
+
+Exercise-6:
+1. Reverse the given word (27)
+2. Reverse all the words (27)
+3. Replace the matching word (28)
+4. Lower case into upper case (30)
+5. To Count the total number of words, lines, characters without (31)
+6. Read the file contents and display it in terminal (32)
+7. Yacc program for while loop (33)
+
+
+
+
+
+Exercise-7:
+1. check the mobile number is vaild or not 
+2. To validate the vit email id (36)
+3. to find factorial of a number (37)
+4. Yacc program for valid C identifier declaration statement. 
+5. Lex program to add Line number to “sampLe.c” program(ignore 
+comment line) (39)
+
+
+Exercise-8:
+1. lex program for decimal to binary (41)
+2. lex program to binary to decimal (41)
+3. yacc program for binary to decimal (42)
+4. yacc program for decimal to binary (44)
+5. yacc program to infix to post fix (45)
+Exercise-9:
+1.	three address  code Infix to prefix (47)
+2.	2. Three address code for a=b+c*d (49)
+3.	3. Three address code for while loop (52)
+
