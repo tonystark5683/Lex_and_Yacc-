@@ -1,0 +1,1452 @@
+
+
+PAT 
+
+Remainder 1
+Q2 Implement an YACC program for L+  such that L=AB where A={10,1} B={000,110}
+    Note: + represents one or more number of  
+    occurrences.
+
+
+%{
+#include <stdio.h>
+%}
+
+%token A B PLUS
+
+%%
+
+input: expression
+     | input expression
+
+expression: A B
+          ;
+
+%%
+
+int main() {
+    yyparse();
+    return 0;
+}
+
+int yyerror(char *s) {
+    printf("Error: %s\n", s);
+    return 0;
+}
+
+int yylex() {
+    int c = yytext[0];
+    switch(c) {
+        case '0':
+            return 0;
+        case '1':
+            return 0;
+        default:
+            break;
+    }
+    c = yytext[1];
+    switch(c) {
+        case '0':
+            if (yytext[2] == '0') {
+                yylval = B;
+                return B;
+            }
+            break;
+        case '1':
+            if (yytext[2] == '0') {
+                yylval = B;
+                return B;
+            } else if (yytext[2] == '\0') {
+                yylval = A;
+                return A;
+            }
+            break;
+        default:
+            break;
+    }
+    if (c == '+') {
+        yylval = PLUS;
+        return PLUS;
+    }
+    return -1;
+}
+
+
+Remainder 2
+
+
+Q1
+Implement a Lex program for the language 
+    L= 1n-1  bn+m such that n≥1 and m≥0
+
+%{
+#include <stdio.h>
+%}
+
+%%
+1+ {
+    int n = yyleng - 1;
+    char* p = yytext + n;
+    int m = 0;
+    while (*p == 'b') {
+        p++;
+        m++;
+    }
+    if (m >= 0 && n == m) {
+        printf("Valid string: %s\n", yytext);
+    } else {
+        printf("Invalid string: %s\n", yytext);
+    }
+}
+b+ {
+    printf("Valid string: %s\n", yytext);
+}
+.|\n {
+    printf("Invalid character: %c\n", yytext[0]);
+}
+
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+
+
+Remaider 2
+Q1
+Implement a Lex program to check whether the parenthesis in a statement is missing or not.
+    For instance, (a+b*(c-d)) balanced
+    (a+b*(c-d) Missed right parenthesis
+    a+b*(c-d)) Missed left parenthesis
+%{
+#include <stdio.h>
+int parentheses = 0; // variable to keep track of the number of open parentheses
+%}
+
+%%
+
+[()]   { // increment or decrement the number of open parentheses
+            if(yytext[0] == '(')
+                parentheses++;
+            else
+                parentheses--;
+        }
+\n     { // check if the number of open parentheses is zero when a newline is encountered
+            if(parentheses == 0)
+                printf("Parentheses are balanced.\n");
+            else
+                printf("Parentheses are not balanced.\n");
+            parentheses = 0; // reset the number of open parentheses for the next statement
+        }
+
+.      ; // ignore any other characters
+
+%%
+
+int main()
+{
+    yylex();
+    return 0;
+}
+
+Q2
+Implement an YACC program to perform scientific calculation such as sin, cos, log and mod operation
+
+%token NUMBER
+%token SIN COS LOG MOD
+%left '+' '-'
+%left '*' '/'
+%nonassoc UMINUS
+
+%%
+
+statement: expression '\n' { printf("%f\n", $1); }
+         | '\n'
+         ;
+
+expression: NUMBER                   { $$ = $1; }
+          | expression '+' expression { $$ = $1 + $3; }
+          | expression '-' expression { $$ = $1 - $3; }
+          | expression '*' expression { $$ = $1 * $3; }
+          | expression '/' expression { $$ = $1 / $3; }
+          | '-' expression %prec UMINUS { $$ = -$2; }
+          | SIN '(' expression ')'    { $$ = sin($3); }
+          | COS '(' expression ')'    { $$ = cos($3); }
+          | LOG '(' expression ')'    { $$ = log($3); }
+          | expression MOD expression { $$ = fmod($1, $3); }
+          ;
+
+%%
+
+int main() {
+  yyparse();
+  return 0;
+}
+
+int yywrap() {
+  return 1;
+}
+
+void yyerror(char const *s) {
+  fprintf(stderr, "%s\n", s);
+}
+
+
+
+Remainder 3
+Q1 Implement a Lex program to count and print words that have exactly three 't' or 'T‘
+    For instance, Input: “attitude attract there”
+Output: 
+    attitude 
+    attract 
+    Count: 2
+    
+    
+%{
+int count = 0;
+%}
+
+%%
+(\b\w*[tT]\w*[tT]\w*[tT]\w*\b) { printf("%s\n", yytext); count++; }
+. { /* ignore other characters */ }
+%%
+
+int main() {
+    yylex();
+    printf("Count: %d\n", count);
+    return 0;
+}
+
+
+Q2 Implement an YACC program for the language L= 1n-1 bn  where n≥1
+
+
+%{
+#include <stdio.h>
+%}
+
+%token b
+%start S
+
+%%
+S : '1' S B
+  | '1' B
+  ;
+
+B : b
+  ;
+
+%%
+
+int main() {
+    yyparse();
+    return 0;
+}
+
+int yyerror(char *s) {
+    printf("%s\n", s);
+    return 0;
+}
+
+
+
+Reamider 4
+Q1 Implement a Lex program that accepts the language L={A^n  B^m} where n≥0 and m≥1
+
+
+%{
+int n = 0; /* count of A's */
+int m = 0; /* count of B's */
+%}
+
+%%
+A { n++; } /* increment count of A's */
+B { m++; } /* increment count of B's */
+\n { /* end of line */
+    if (n >= 0 && m >= 1) /* check if in language */
+        printf("Accepted\n");
+    else
+        printf("Rejected\n");
+    /* reset counts for next line */
+    n = 0;
+    m = 0;
+}
+. { /* ignore all other characters */ }
+%%
+
+int main()
+{
+    yylex();
+    return 0;
+}
+
+
+
+Q2 Implement an YACC program for balanced parenthesis expression (well formed parenthesis)
+   For instance, ((a+d*(b+c))) is valid
+   ((a+d*(b+c)) is invalid
+   )a+b( is invalid
+   (a+(b*c)) is valid
+
+
+%
+#include <stdio.h>
+#include <stdlib.h>
+%}
+
+%token LPAREN RPAREN
+%token <strval> IDENTIFIER
+%token <intval> NUMBER
+
+%left '+' '-'
+%left '*' '/'
+
+%%
+
+expression:
+    IDENTIFIER
+    | NUMBER
+    | LPAREN expression RPAREN
+    | expression '+' expression
+    | expression '-' expression
+    | expression '*' expression
+    | expression '/' expression
+    ;
+
+%%
+
+int main() {
+    yyparse();
+    return 0;
+}
+
+void yyerror(char const *message) {
+    fprintf(stderr, "%s\n", message);
+    exit(1);
+}
+
+
+
+Decimal to binary Lex Program
+
+
+/* Lex program for decimal to binary conversion */
+
+%{
+/* Definition section */
+#include<stdio.h>
+int num, r, b=0, p=1;
+%}
+
+DIGIT [0-9]
+/* Rule Section */
+%%
+{DIGIT}+ { num=atoi(yytext);
+			while (num > 0)
+			{
+			r= num % 2;
+			b+= r*p;
+			p*= 10;
+			num/= 2;
+			}
+			printf("%d", b);
+			}
+.|\n ECHO;
+		
+%%
+
+// driver code
+int main()
+{
+	yylex();
+	return 0;
+}	
+
+
+
+Yacc Program for Binary to Decimal
+Lex 
+
+%{
+/* Definition section */
+#include<stdio.h>
+#include<stdlib.h>
+#include"y.tab.h"
+extern int yylval;
+%}
+
+/* Rule Section */
+%%
+0 {yylval=0;return ZERO;}
+1 {yylval=1;return ONE;}
+
+[ \t] {;}
+\n return 0;
+. return yytext[0];
+%%
+
+	
+int yywrap()
+{
+return 1;
+}
+
+
+
+%{
+/* Definition section */
+#include<stdio.h>
+#include<stdlib.h>
+void yyerror(char *s);
+%}
+%token ZERO ONE
+
+/* Rule Section */
+%%
+N: L {printf("\n%d", $$);}
+L: L B {$$=$1*2+$2;}
+| B {$$=$1;}
+B:ZERO {$$=$1;}
+|ONE {$$=$1;};
+%%
+
+//driver code
+int main()
+{
+while(yyparse());
+}
+
+yyerror(char *s)
+{
+fprintf(stdout, "\n%s", s);
+}
+
+
+C program Decimal into binary
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int n,d,rev=0,base=1;
+    printf("\n enter the no in decimal form\n");
+    scanf("%d",&n);
+    do
+    {
+        d=n%2;
+        n=n/2;
+        rev=rev+(d*base);
+        base=base*10;
+    }
+    while(n!=0);
+    printf("\n the binary form=%d",rev);
+    return 0;
+}
+
+
+Infix to Postfix Lex Program 
+
+Code :-
+
+
+
+%{
+#include "y.tab.h"
+int yylval;
+%}
+ID [a-zA-Z]
+%%
+{ID} {yylval=*yytext;return ID;}
+[\n \t] {}
+. {return *yytext;}
+%%
+
+
+Infix o Postfix Lex and Yacc Program
+
+%{
+/* Definition section */
+%}
+ALPHA [A-Z a-z]
+DIGIT [0-9]
+
+/* Rule Section */
+%%
+{ALPHA}({ALPHA}|{DIGIT})* return ID;
+{DIGIT}+				 {yylval=atoi(yytext); return ID;}
+[\n \t]				 yyterminate();
+.						 return yytext[0];
+%%
+Yacc Code 
+%{
+/* Definition section */
+#include <stdio.h>
+#include <stdlib.h>
+%}
+
+%token ID
+%left '+' '-'
+%left '*' '/'
+%left UMINUS
+
+/* Rule Section */
+%%
+
+S : E
+E : E'+'{A1();}T{A2();}
+| E'-'{A1();}T{A2();}
+| T
+;
+T : T'*'{A1();}F{A2();}
+| T'/'{A1();}F{A2();}
+| F
+;
+F : '('E{A2();}')'
+| '-'{A1();}F{A2();}
+| ID{A3();}
+;
+
+%%
+
+#include"lex.yy.c"
+char st[100];
+int top=0;
+
+//driver code
+int main()
+{
+	printf("Enter infix expression: ");
+	yyparse();
+	printf("\n");
+	return 0;
+}
+A1()
+{
+	st[top++]=yytext[0];
+}
+
+A2()
+{
+	printf("%c", st[--top]);
+}
+
+A3()
+{
+	printf("%c", yytext[0]);
+}
+
+
+Three Address Code 
+
+%{
+
+#include <stdio.h>
+#include <string.h>
+%}
+
+LETTER [A-Za-z]
+DIGIT [0-9]
+OPERATOR [+-*/=<>&|!(){}]
+FOR "for"
+WHILE "while"
+IF "if"
+DO "do"
+ELSE "else"
+THEN "then"
+
+%%
+{LETTER} {strcpy(yylval.id,yytext);
+return LETTER;}
+{DIGIT}+"."{DIGIT}+ {strcpy(yylval.id,yytext);
+return FLOAT;}
+{DIGIT}+ {strcpy(yylval.id,yytext);
+return INTEGER;}
+{FOR} {return FOR;}
+{WHILE} {return WHILE;}
+{DO} {return DO;}
+{IF} {return IF;}
+{THEN} {return THEN;}
+{ELSE} {return ELSE;}
+[ \n\t]* ;
+"end" {return 0;}
+%%
+
+
+Yacc 
+%{
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+#include<string.h>
+
+#include<ctype.h>
+
+#include<math.h>
+
+#define START 100
+
+typedef struct s
+
+{
+
+int* true;
+
+int* false;
+
+int* next;
+
+int quad;
+
+char place[5];
+
+}ETYPE;
+
+int nextquad=START;
+
+char code[25][50];
+
+%}
+
+
+
+%union
+
+{
+
+char id[10];
+
+ETYPE eval;
+
+}
+
+
+
+%left "|"
+
+%left "&"
+
+%left "!"
+
+%left "<" ">"
+
+%left "+" "-"
+
+%left "*" "/"
+
+%left "(" ")"
+
+
+
+%right "="
+
+
+
+%token <id> LETTER INTEGER FLOAT
+
+%token FOR WHILE DO IF THEN ELSE
+
+%type <eval> PROGRAM BLOCK STATEMENTS ASSIGN COND LVAL E M N Q
+
+
+
+%start PROGRAM
+
+
+
+%%
+
+
+
+PROGRAM: BLOCK {
+
+int i;
+
+Backpatch($1.next,nextquad);
+
+for(i=START;i<nextquad;i++)
+
+printf("\n%s",code[i-START]);
+
+printf("\n%d\n",nextquad);
+
+}
+
+
+
+BLOCK: DO M BLOCK WHILE M COND {
+
+Backpatch($6.true,$2.quad);
+
+$$.next=$6.false;
+
+}
+
+| FOR ASSIGN M COND M ASSIGN Q BLOCK {
+
+Backpatch($8.next,$5.quad);
+
+Backpatch($6.next,$3.quad);
+
+Backpatch($4.true,$7.quad);
+
+$$.next=$4.false;
+
+sprintf(code[nextquad-START],"%d\tgoto %d",nextquad,$5.quad);
+
+Gen();
+
+}
+
+| WHILE M COND M BLOCK {
+
+Backpatch($5.next,$2.quad);
+
+Backpatch($3.true,$4.quad);
+
+$$.next=$3.false;
+
+sprintf(code[nextquad-START],"%d\tgoto %d",nextquad,$2.quad);
+
+Gen();
+
+}
+
+| IF COND M BLOCK {
+
+Backpatch($2.true,$3.quad);
+
+$$.next=Merge($2.false,$4.next);
+
+}
+
+| IF COND M BLOCK N ELSE M BLOCK {
+
+Backpatch($2.true,$3.quad);
+
+Backpatch($2.false,$7.quad);
+
+$$.next=Merge($4.next,$5.next);
+
+$$.next=Merge($$.next,$8.next);
+
+}
+
+| '{' STATEMENTS '}' {
+
+$$.next=$2.next;
+
+}
+
+| ASSIGN ';' {
+
+$$.next=(int*)malloc(sizeof(int)*15);
+
+$$.next[0]=0;
+
+}
+
+| E { }
+
+
+
+STATEMENTS: STATEMENTS M BLOCK {
+
+Backpatch($1.next,$2.quad);
+
+$$.next=$3.next;
+
+}
+
+| BLOCK {
+
+$$.next=$1.next;
+
+}
+
+
+
+ASSIGN: LVAL '=' E {
+
+sprintf(code[nextquad-START],"%d\t%s = %s",nextquad,$1.place,$3.place);
+
+Gen();
+
+}
+
+| E { }
+
+
+
+LVAL: LETTER {strcpy($$.place,$1);}
+
+
+
+E: E '+' E {
+
+strcpy($$.place,Newtemp());
+
+sprintf(code[nextquad-START],"%d\t%s = %s + %s",nextquad,$$.place,$1.place,$3.place);
+
+Gen();
+
+}
+
+| E '-' E {
+
+strcpy($$.place,Newtemp());
+
+sprintf(code[nextquad-START],"%d\t%s = %s - %s",nextquad,$$.place,$1.place,$3.place);
+
+Gen();
+
+}
+
+| E '*' E {
+
+strcpy($$.place,Newtemp());
+
+sprintf(code[nextquad-START],"%d\t%s = %s * %s",nextquad,$$.place,$1.place,$3.place);
+
+Gen();
+
+}
+
+| E '/' E {
+
+strcpy($$.place,Newtemp());
+
+sprintf(code[nextquad-START],"%d\t%s = %s / %s",nextquad,$$.place,$1.place,$3.place);
+
+Gen();
+
+}
+
+| '-' E %prec '*' {
+
+strcpy($$.place,Newtemp());
+
+sprintf(code[nextquad-START],"%d\t%s = - %s",nextquad,$$.place,$2.place);
+
+Gen();
+
+}
+
+| LETTER {
+
+strcpy($$.place,$1);
+
+}
+
+| INTEGER {
+
+strcpy($$.place,$1);
+
+}
+
+| FLOAT {
+
+strcpy($$.place,$1);
+
+}
+
+
+
+COND: COND '&' M COND {
+
+Backpatch($1.true,$3.quad);
+
+$$.true=$4.true;
+
+$$.false=Merge($1.false,$4.false);
+
+}
+
+| COND '|' M COND {
+
+Backpatch($1.false,$3.quad);
+
+$$.true=Merge($1.true,$4.true);
+
+$$.false=$4.false;
+
+}
+
+| '!' COND {
+
+$$.true=$2.false;
+
+$$.false=$2.true;
+
+}
+
+| '(' COND ')' {
+
+$$.true=$2.true;
+
+$$.false=$2.false;
+
+}
+
+| E '<' E {
+
+$$.true=Makelist(nextquad);
+
+$$.false=Makelist(nextquad+1);
+
+sprintf(code[nextquad-START],"%d\tif %s < %s goto ",nextquad,$1.place,$3.place);
+
+Gen();
+
+sprintf(code[nextquad-START],"%d\tgoto ",nextquad);
+
+Gen();
+
+}
+
+| E '>' E {
+
+$$.true=Makelist(nextquad);
+
+$$.false=Makelist(nextquad+1);
+
+sprintf(code[nextquad-START],"%d\tif %s > %s goto ",nextquad,$1.place,$3.place);
+
+Gen();
+
+sprintf(code[nextquad-START],"%d\tgoto ",nextquad);
+
+Gen();
+
+}
+
+| E {
+
+$$.true=Makelist(nextquad);
+
+$$.false=Makelist(nextquad+1);
+
+sprintf(code[nextquad-START],"%d\tif %s goto ",nextquad,$1.place);
+
+Gen();
+
+sprintf(code[nextquad-START],"%d\tgoto ",nextquad);
+
+Gen();
+
+}
+
+
+
+M: {
+
+$$.quad=nextquad;
+
+}
+
+N: {
+
+$$.next=Makelist(nextquad);
+
+sprintf(code[nextquad-START],"%d\tgoto ",nextquad);
+
+Gen();
+
+}
+
+Q: {
+
+$$.next=Makelist(nextquad);
+
+sprintf(code[nextquad-START],"%d\tgoto ",nextquad);
+
+Gen();
+
+$$.quad=nextquad;
+
+}
+
+
+
+%%
+
+
+
+/*
+#include "lex.yy.c"
+
+
+
+main()
+
+{
+
+yyparse();
+
+}
+
+*/
+
+yyerror(char *errmesg)
+
+{
+
+printf("\n%s\n",errmesg);
+
+}
+
+
+
+char* Newtemp()
+
+{
+
+static int count=1;
+
+char* ch=(char*)malloc(sizeof(char)*5);
+
+sprintf(ch,"T%d",count++);
+
+return ch;
+
+}
+
+
+
+int* Makelist(int nquad)
+
+{
+
+int* list=(int*)malloc(sizeof(int)*15);
+
+list[0]=nquad;
+
+list[1]=0;
+
+return list;
+
+}
+
+
+
+int* Merge(int* list1,int* list2)
+
+{
+
+int* temp=list1,count1=0,count2=0;
+
+while(list1[count1]!=0) count1++;
+
+while(list1[count2]!=0)
+
+{
+
+list1[count1]=list2[count2];
+
+count1++;
+
+count2++;
+
+}
+
+return temp;
+
+}
+
+
+
+void Backpatch(int* list,int nquad)
+
+{
+
+char addr[10];
+
+sprintf(addr,"%d",nquad);
+
+while(*list!=0)
+
+{
+
+int index=*list++-START;
+
+strcat(code[index],addr);
+
+}
+
+}
+
+
+
+void Gen()
+
+{
+
+nextquad++;
+
+}
+
+
+
+For LOop Lex and Yacc rogram
+
+
+alpha [A-Za-z]
+digit [0-9]
+
+%%
+
+[\t \n]
+for             return FOR;
+{digit}+    return NUM;
+{alpha}({alpha}|{digit})* return ID;
+"<="         return LE;
+">="         return GE;
+"=="         return EQ;
+"!="          return NE;
+"||"            return OR;
+"&&"         return AND;
+.                return yytext[0];
+
+%%
+
+
+// Yacc file: for.y
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+%token ID NUM FOR LE GE EQ NE OR AND
+%right "="
+%left OR AND
+%left '>' '<' LE GE EQ NE
+%left '+' '-'
+%left '*' '/'
+%right UMINUS
+%left '!'
+
+%%
+   
+S         : ST {printf("Input accepted\n"); exit(0);}
+ST       : FOR '(' E ';' E2 ';' E ')' DEF
+           ;
+DEF    : '{' BODY '}'
+           | E';'
+           | ST
+           |
+           ;
+BODY  : BODY BODY
+           | E ';'       
+           | ST
+           |            
+           ;
+       
+E        : ID '=' E
+          | E '+' E
+          | E '-' E
+          | E '*' E
+          | E '/' E
+          | E '<' E
+          | E '>' E
+          | E LE E
+          | E GE E
+          | E EQ E
+          | E NE E
+          | E OR E
+          | E AND E
+          | E '+' '+'
+          | E '-' '-'
+          | ID 
+          | NUM
+          ;
+
+   
+E2     : E'<'E
+         | E'>'E
+         | E LE E
+         | E GE E
+         | E EQ E
+         | E NE E
+         | E OR E
+         | E AND E
+         ;   
+%%
+
+#include "lex.yy.c"
+main() {
+    printf("Enter the expression:\n");
+    yyparse();
+}     
+
+
+Lex and YAcc Program foe while loop
+
+alpha [A-Za-z]
+digit [0-9]
+%%
+[ \t\n]  
+while    return WHILE;
+{digit}+    return NUM;
+{alpha}({alpha}|{digit})*    return ID;
+"<="    return LE;
+">="    return GE;
+"=="    return EQ;
+"!="    return NE;
+"||"    return OR;
+"&&"    return AND;
+.    return yytext[0];
+%%
+
+(wh.y)
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+%token ID NUM WHILE LE GE EQ NE OR AND
+%right '='
+%left AND OR
+%left '<' '>' LE GE EQ NE
+%left '+''-'
+%left '*''/'
+%right UMINUS
+%left '!'
+%%
+S        : ST1 {printf("Input accepted.\n");exit(0);};
+ST1    :    WHILE'(' E2 ')' '{' ST '}'
+ST      :     ST ST
+          | E';'
+          ;
+E       : ID'='E
+          | E'+'E
+          | E'-'E
+          | E'*'E
+          | E'/'E
+          | E'<'E
+          | E'>'E
+          | E LE E
+          | E GE E
+          | E EQ E
+          | E NE E
+          | E OR E
+          | E AND E
+          | ID
+          | NUM
+          ;
+E2     : E'<'E
+          | E'>'E
+          | E LE E
+          | E GE E
+          | E EQ E
+          | E NE E
+          | E OR E
+          | E AND E
+          | ID
+          | NUM
+          ;
+
+%%
+
+#include "lex.yy.c"
+
+main()
+{
+   printf("Enter the exp: ");
+   yyparse();
+}
+
+
+
+Infix to prefix 
+
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "y.tab.h"
+%}  
+
+NUM [0-9]+ 
+CHARACTER [_a-zA-Z][_a-zA-Z0-9]* 
+%%
+  
+exit.*      { return EXIT; } 
+quit.*      { return EXIT; } 
+{NUM}   	{yylval.exp = strdup(yytext);  return NUM;} 
+{CHARACTER}	{ yylval.exp = strdup(yytext);  return CHARACTER;} 
+[+-]        { yylval.exp = strdup(yytext);  return OPR1;  } 
+[/*]        { yylval.exp = strdup(yytext);  return OPR2;  } 
+[()]        { return yytext[0]; } 
+\n          { return NEWLINE; } 
+.           ;  
+%%  
+
+YAcc 
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+extern int yylex();
+int yyerror(const char *p);
+char *concat(const char* s1, const char* s2, const char*s3);
+%}   
+
+%union {
+char *exp;
+int val;
+};
+%token NUM CHARACTER OPR1 OPR2 NEWLINE EXIT  
+%left OPR1 %left OPR2  %start lines
+
+%%  
+lines: /*empty*/
+	|lines exp NEWLINE { printf("%s\n>> ",$<exp>2);}
+	;
+exp: exp OPR1 exp {$<exp>$ = concat($<exp>2,$<exp>1,$<exp>3);}
+	|exp OPR2 exp {$<exp>$ = concat($<exp>2,$<exp>1,$<exp>3);}
+	|'(' exp ')'  {$<exp>$ = $<exp>2;}
+	|NUM{$<exp>$ = $<exp>1;}
+	|CHARACTER   {$<exp>$ = $<exp>1;}
+	|EXIT {exit(0);}
+	;
+	
+%%
+int yywrap(){
+	return 1;
+}
+
+int main(){
+	yyparse();
+}
+
+char *concat(const char* s1, const char* s2, const char*s3){
+	int len = strlen(s1) + strlen(s2) + strlen(s3) + 1;
+	char *s = malloc(sizeof(char)*len);
+	int i=0;
+	for(int j=0; s1[j]!='\0'; j++)
+		s[i++] = s1[j];
+	for(int j=0; s2[j]!='\0'; j++)
+		s[i++] = s2[j];
+	for(int j=0; s3[j]!='\0'; j++)
+		s[i++] = s3[j];
+	s[i] = '\0';
+return s;}
+
+int yyerror(const char *p){
+	printf("%s\n",p); return 1;
+}
+
+
+Q2 Three address code for a=b+c*d
+%{
+#include"y.tab.h"
+extern char yyval;
+%}
+
+%%
+
+[0-9]+ 	{yylval.symbol=(char)(yytext[0]);return NUMBER;}
+[a-z] 	{yylval.symbol= (char)(yytext[0]);return LETTER;}
+. 		{return yytext[0];}
+\n 		{return 0;}
+
+%%
+
+
+YAcc 
+
+%{
+#include "y.tab.h"
+#include <stdio.h>
+#include <ctype.h>
+char addtotable(char,char,char);
+int index1 = 0;
+char temp = 'A'-1;
+
+struct expr{
+	char operand1;
+	char operand2;
+	char operator;
+	char result;
+};
+%}
+
+%union{
+char symbol;
+}
+%left '+' '-'
+%left '/' '*'
+%token <symbol> LETTER NUMBER
+%type <symbol> exp
+%%
+
+statement: 	LETTER '=' exp ';' {addtotable((char)$1,(char)$3,'=');};
+exp: 		exp '+' exp {$$ = addtotable((char)$1,(char)$3,'+');}
+    		|exp '-' exp {$$ = addtotable((char)$1,(char)$3,'-');}
+    		|exp '/' exp {$$ = addtotable((char)$1,(char)$3,'/');}
+    		|exp '*' exp {$$ = addtotable((char)$1,(char)$3,'*');}
+    		|'(' exp ')' {$$= (char)$2;}
+    		|NUMBER {$$ = (char)$1;}
+    		|LETTER {(char)$1;};
+
+%%
+
+struct expr arr[20]; 
+void yyerror(char *s){
+    printf("Errror %s",s);
+}
+
+char addtotable(char a, char b, char o){
+    temp++;
+    arr[index1].operand1 =a;
+    arr[index1].operand2 = b;
+    arr[index1].operator = o;
+    arr[index1].result=temp;
+    index1++;
+    return temp;
+}
+
+void threeAdd(){
+	int i=0;
+    char temp='A';
+    while(i<index1){
+        printf("%c:=\t",arr[i].result);
+        printf("%c\t",arr[i].operand1);
+        printf("%c\t",arr[i].operator);
+        printf("%c\t",arr[i].operand2);
+        i++;
+        temp++;
+        printf("\n");
+    }
+}
+
+int find(char l){
+    int i;
+    for(i=0;i<index1;i++)
+        if(arr[i].result==l) break;
+    return i;
+}
+
+int yywrap(){
+    return 1;
+}
+
+int main(){
+    printf("Enter the expression: ");
+    yyparse();
+    threeAdd();
+    return 0;
+}
+
+
+
+
+
+
+
+
